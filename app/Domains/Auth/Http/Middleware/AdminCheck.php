@@ -2,25 +2,34 @@
 
 namespace App\Domains\Auth\Http\Middleware;
 
-use App\Domains\Auth\Models\User;
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Class AdminCheck.
+ *
+ * Middleware to ensure that only users with admin privileges can access certain routes.
  */
 class AdminCheck
 {
     /**
-     * @param $request
-     * @param  Closure  $next
+     * Handle an incoming request.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if ($request->user() && $request->user()->isType(User::TYPE_ADMIN)) {
+        // Check if there's an authenticated user and if the user is an admin
+        if (Auth::check() && Auth::user()->isType('admin')) {
             return $next($request);
         }
 
+        // Optionally, include a flash message or log statement here to indicate unauthorized access attempt
+        
+        // Redirect non-admin users to a specific route
         return redirect()->route('frontend.index')->withFlashDanger(__('You do not have access to do that.'));
     }
 }

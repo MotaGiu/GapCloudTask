@@ -65,8 +65,8 @@
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                             @if ($logged_in_user->isAdmin())
                                 <x-utils.link
-                                    :href="route('admin.dashboard')"
-                                    :text="__('Administration')"
+                                    :href="route('frontend.user.dashboard')"
+                                    :text="__('Dashboard')"
                                     class="dropdown-item" />
                             @endif
 

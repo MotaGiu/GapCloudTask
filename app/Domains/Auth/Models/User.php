@@ -45,7 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<string>
      */
     protected $fillable = [
         'type',
@@ -61,12 +61,13 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
         'to_be_logged_out',
         'provider',
         'provider_id',
+        'profile_picture',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array
+     * @var array<string>
      */
     protected $hidden = [
         'password',
@@ -74,40 +75,62 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     ];
 
     /**
-     * @var array
-     */
-    protected $dates = [
-        'last_login_at',
-        'email_verified_at',
-        'password_changed_at',
-    ];
-
-    /**
      * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
-        'active' => 'boolean',
-        'last_login_at' => 'datetime',
         'email_verified_at' => 'datetime',
+        'active' => 'boolean',
         'to_be_logged_out' => 'boolean',
+        'last_login_at' => 'datetime',
+        'password_changed_at' => 'datetime',
     ];
 
     /**
-     * @var array
+     * The attributes that are appended to the model's array form.
+     *
+     * @var array<string>
      */
     protected $appends = [
         'avatar',
     ];
 
     /**
-     * @var string[]
+     * The relationships that should always be loaded.
+     *
+     * @var array<string>
      */
     protected $with = [
-        'permissions',
         'roles',
+        'permissions',
     ];
+
+    /**
+     * Checks if the user is an admin.
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->type === self::TYPE_ADMIN;
+    }
+
+    /**
+     * Get the avatar attribute.
+     *
+     * @return string
+     */
+    public function getAvatarAttribute()
+    {
+        if (!$this->profile_picture || !\Storage::disk('public')->exists('profile_pictures/' . $this->profile_picture)) {
+            return asset('default/avatar.png'); // Path to default avatar if not exist
+        }
+
+        return asset('storage/profile_pictures/' . $this->profile_picture);
+    }
+    
+
 
     /**
      * Send the password reset notification.
@@ -121,11 +144,25 @@ class User extends Authenticatable implements MustVerifyEmail, TwoFactorAuthenti
     }
 
     /**
-     * Send the registration verification email.
+     * Send the email verification notification.
+     *
+     * @return void
      */
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmail);
+    }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::creating(function ($user) {
+            // Handle any default setup before a user is created
+        });
     }
 
     /**

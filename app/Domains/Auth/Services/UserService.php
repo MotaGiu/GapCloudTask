@@ -318,16 +318,18 @@ class UserService extends BaseService
      * @return User
      */
     protected function createUser(array $data = []): User
-    {
-        return $this->model::create([
-            'type' => $data['type'] ?? $this->model::TYPE_USER,
-            'name' => $data['name'] ?? null,
-            'email' => $data['email'] ?? null,
-            'password' => $data['password'] ?? null,
-            'provider' => $data['provider'] ?? null,
-            'provider_id' => $data['provider_id'] ?? null,
-            'email_verified_at' => $data['email_verified_at'] ?? null,
-            'active' => $data['active'] ?? true,
-        ]);
-    }
+{
+    return $this->model::create([
+        'type' => $data['type'] ?? $this->model::TYPE_USER,
+        'name' => $data['name'] ?? null,
+        'email' => $data['email'] ?? null,
+        'password' => $data['password'] ?? null,
+        'provider' => $data['provider'] ?? null,
+        'provider_id' => $data['provider_id'] ?? null,
+        'email_verified_at' => $data['email_verified_at'] ?? null,
+        'active' => $data['active'] ?? true,
+        'profile_picture' => $data['profile_picture'] ?? null, // Add this line
+    ]);
+}
+
 }
